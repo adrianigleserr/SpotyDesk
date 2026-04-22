@@ -160,9 +160,14 @@
               <button (click)="seleccionarDia(dia)" [class.bg-blue-600]="esHoy(dia)" [class.text-white]="esHoy(dia)"
                 [class.ring-2]="dia === diaSeleccionado && !esHoy(dia)" [class.ring-blue-400]="dia === diaSeleccionado"
                 class="py-2 rounded-xl transition-all relative font-bold hover:bg-blue-50 outline-none">
+
                 {{ dia }}
-                @if (esHoy(dia)) {
-                <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full"></span>
+
+                @if (tieneNotas(dia)) {
+                <span class="absolute bottom-1 left-1/2 -translate-x-1/2 flex justify-center">
+                  <span [class]="esHoy(dia) ? 'bg-white' : 'bg-blue-500'" class="w-1 h-1 rounded-full shadow-sm">
+                  </span>
+                </span>
                 }
               </button>
               }
@@ -187,6 +192,10 @@
                   <div>
                     <p class="text-xs text-slate-400 font-bold mb-0.5">{{ nota.hora }}</p>
                     <p class="text-sm font-bold text-slate-800">{{ nota.titulo }}</p>
+
+                    @if (nota.descripcion) {
+                    <p class="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-tight">{{ nota.descripcion }}</p>
+                    }
                   </div>
                 </div>
 
@@ -219,52 +228,53 @@
 
       @if (mostrarModalNota) {
       <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl scale-in-center">
-          <h3 class="text-xl font-bold text-slate-800 mb-6">Nueva Nota</h3>
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl scale-in-center">
+          <h3 class="text-xl font-bold text-slate-800 mb-6 border-b border-slate-100 pb-4">Nueva Nota</h3>
 
-          <div class="space-y-6">
+          <div class="space-y-5">
             <div>
-              <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Título</label>
+              <label class="block text-xs font-bold text-slate-400 uppercase mb-2">¿Qué tienes planeado?</label>
               <input [(ngModel)]="nuevaNota.titulo" type="text" placeholder="Ej: Reunión técnica"
                 class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
             </div>
 
-            <div>
-              <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Hora del evento</label>
-              <div class="flex items-center gap-3">
-
-                <div class="flex-1">
-                  <div class="relative">
-                    <input [(ngModel)]="nuevaNota.hora" type="number" min="0" max="23"
-                      class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none text-center font-bold text-slate-700">
-                    <span class="absolute -top-2 left-3 bg-white px-1 text-[10px] text-slate-400 font-bold">HH</span>
-                  </div>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <div class="flex-1">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Comienza</label>
+                <div class="flex items-center gap-2">
+                  <input [(ngModel)]="nuevaNota.hora" type="number" placeholder="00"
+                    class="w-16 border border-slate-200 rounded-lg py-2 text-center font-bold">
+                  <span class="font-bold text-slate-300">:</span>
+                  <input [(ngModel)]="nuevaNota.minutos" type="number" placeholder="00"
+                    class="w-16 border border-slate-200 rounded-lg py-2 text-center font-bold">
                 </div>
-
-                <span class="text-2xl font-bold text-slate-300">:</span>
-
-                <div class="flex-1">
-                  <div class="relative">
-                    <input [(ngModel)]="nuevaNota.minutos" type="number" min="0" max="59" step="5"
-                      class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none text-center font-bold text-slate-700">
-                    <span class="absolute -top-2 left-3 bg-white px-1 text-[10px] text-slate-400 font-bold">MM</span>
-                  </div>
-                </div>
-
               </div>
-              <p class="text-[10px] text-slate-400 mt-2 italic text-center">Formato 24 horas (ej. 14:30)</p>
+
+              <div class="flex-1 border-l border-slate-100 sm:pl-4">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Termina (Opcional)</label>
+                <div class="flex items-center gap-2">
+                  <input [(ngModel)]="nuevaNota.horaFin" type="number" placeholder="00"
+                    class="w-16 border border-slate-200 rounded-lg py-2 text-center font-bold bg-slate-50">
+                  <span class="font-bold text-slate-300">:</span>
+                  <input [(ngModel)]="nuevaNota.minutosFin" type="number" placeholder="00"
+                    class="w-16 border border-slate-200 rounded-lg py-2 text-center font-bold bg-slate-50">
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Descripción breve</label>
+              <textarea [(ngModel)]="nuevaNota.descripcion" rows="3" placeholder="Añade detalles adicionales..."
+                class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"></textarea>
             </div>
           </div>
 
           <div class="flex gap-3 mt-8">
             <button (click)="cerrarModal()"
-              class="flex-1 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-all">
-              Cancelar
-            </button>
+              class="flex-1 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-all">Cancelar</button>
             <button (click)="guardarNota()"
-              class="flex-1 py-3 font-bold text-white bg-blue-600 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all">
-              Guardar
-            </button>
+              class="flex-1 py-3 font-bold text-white bg-blue-600 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all">Guardar
+              Nota</button>
           </div>
         </div>
       </div>
