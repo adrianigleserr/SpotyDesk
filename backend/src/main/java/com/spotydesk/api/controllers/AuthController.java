@@ -7,7 +7,7 @@ import com.spotydesk.api.models.EmpresaCliente;
 import com.spotydesk.api.services.EmpleadoService;
 import com.spotydesk.api.services.EmpresaClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder; 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -29,23 +29,41 @@ public class AuthController {
     @PostMapping("/registro")
     public Empleado registrarNuevaCuenta(@RequestBody RegistroRequest request) {
 
+        // Extraemos el dominio (ej: gmail.com)
         String dominio = request.getCorreo().substring(request.getCorreo().indexOf("@") + 1);
 
-        EmpresaCliente nuevaEmpresa = new EmpresaCliente();
-        nuevaEmpresa.setNombreEmpresa(request.getNombreEmpresa());
-        nuevaEmpresa.setDominioCorporativo(dominio);
-        nuevaEmpresa = empresaService.crearEmpresa(nuevaEmpresa);
+        // --- LÓGICA INTELIGENTE PARA LA EMPRESA ---
+        EmpresaCliente empresaFinal;
+
+        // Intentamos buscar si ya existe una empresa con ese dominio
+        var empresaExistente = empresaService.buscarPorDominio(dominio);
+
+        if (empresaExistente.isPresent()) {
+            // Si existe, la asignamos directamente
+            empresaFinal = empresaExistente.get();
+        } else {
+            // Si no existe, creamos la nueva empresa
+            EmpresaCliente nuevaEmpresa = new EmpresaCliente();
+            nuevaEmpresa.setNombreEmpresa(request.getNombreEmpresa());
+            nuevaEmpresa.setDominioCorporativo(dominio);
+            empresaFinal = empresaService.crearEmpresa(nuevaEmpresa);
+        }
+        // ------------------------------------------
 
         Empleado nuevoEmpleado = new Empleado();
         nuevoEmpleado.setNombre(request.getNombre());
 
         String[] partesApellidos = request.getApellidos().split(" ", 2);
         nuevoEmpleado.setApellido1(partesApellidos[0]);
-        if (partesApellidos.length > 1)
+        if (partesApellidos.length > 1) {
             nuevoEmpleado.setApellido2(partesApellidos[1]);
+        }
 
         nuevoEmpleado.setCorreo(request.getCorreo());
-        nuevoEmpleado.setEmpresa(nuevaEmpresa);
+
+        // Vinculamos al empleado con la empresa (sea la nueva o la encontrada)
+        nuevoEmpleado.setEmpresa(empresaFinal);
+
         nuevoEmpleado.setPuestoTrabajo("Administrador");
 
         String hashPassword = passwordEncoder.encode(request.getPassword());
@@ -67,5 +85,6 @@ public class AuthController {
         respuesta.put("nombreEmpresa", empleado.getEmpresa().getNombreEmpresa());
 
         return respuesta;
+
     }
 }
