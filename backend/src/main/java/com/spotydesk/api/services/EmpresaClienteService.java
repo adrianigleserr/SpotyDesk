@@ -4,7 +4,7 @@ import com.spotydesk.api.models.EmpresaCliente;
 import com.spotydesk.api.repositories.EmpresaClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.util.Optional;
 import java.util.List;
 
 @Service // Le dice a Spring que esta clase contiene la lógica de negocio
@@ -18,6 +18,10 @@ public class EmpresaClienteService {
         // Aquí en el futuro puedes poner validaciones (ej. comprobar si el dominio ya
         // existe)
         return repository.save(empresa);
+    }
+
+    public Optional<EmpresaCliente> buscarPorDominio(String dominio) {
+        return repository.findByDominioCorporativo(dominio);
     }
 
     // Método para obtener todas las empresas

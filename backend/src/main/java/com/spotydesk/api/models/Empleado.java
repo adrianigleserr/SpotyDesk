@@ -10,7 +10,7 @@ public class Empleado {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idEmpleado;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(unique = true)
     private String dni;
 
     @Column(nullable = false, length = 100)
