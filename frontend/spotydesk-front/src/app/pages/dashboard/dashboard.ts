@@ -16,30 +16,31 @@ export class Dashboard implements OnInit {
   nombreMes = '';
   diaHoy = this.fechaHoy.getDate();
   diasDelMes: (number | null)[] = [];
-  diaSeleccionado: number = this.diaHoy; // Por defecto hoy
+  diaSeleccionado: number = this.diaHoy;
 
   mostrarModalNota = false;
+
+  // Objeto corregido para los inputs
   nuevaNota = {
     titulo: '',
-    hora: '09',    // Valor por defecto
-    minutos: '00'  // Valor por defecto
+    hora: '09',
+    minutos: '00',
+    horaFin: '',
+    minutosFin: '',
+    descripcion: ''
   };
 
-  // Aquí guardaremos todas las notas del sistema
-  // Usamos un ID para poder borrarlas fácilmente
   todasLasNotas: any[] = [
     { id: 1, titulo: 'Reunión de Equipo', hora: '09:00 - 10:30', color: 'bg-blue-600', fechaClave: this.obtenerClave(this.diaHoy, this.fechaHoy.getMonth(), this.fechaHoy.getFullYear()) },
-    { id: 2, titulo: 'Reserva Puesto 42', hora: 'Todo el día', color: 'bg-emerald-500', fechaClave: this.obtenerClave(this.diaHoy, this.fechaHoy.getMonth(), this.fechaHoy.getFullYear()) }
   ];
 
   ngOnInit() {
     this.actualizarCalendario();
   }
 
-  // Función mágica para filtrar solo las notas del día que el usuario está viendo
   get notasDelDia() {
-    const claveBusqueda = this.obtenerClave(this.diaSeleccionado, this.fechaVisual.getMonth(), this.fechaVisual.getFullYear());
-    return this.todasLasNotas.filter(n => n.fechaClave === claveBusqueda);
+    const clave = this.obtenerClave(this.diaSeleccionado, this.fechaVisual.getMonth(), this.fechaVisual.getFullYear());
+    return this.todasLasNotas.filter(n => n.fechaClave === clave);
   }
 
   obtenerClave(dia: number, mes: number, año: number): string {
@@ -67,36 +68,40 @@ export class Dashboard implements OnInit {
     this.actualizarCalendario();
   }
 
-  seleccionarDia(dia: number) {
-    this.diaSeleccionado = dia;
-  }
-
+  seleccionarDia(dia: number) { this.diaSeleccionado = dia; }
   abrirModal() { this.mostrarModalNota = true; }
   cerrarModal() { this.mostrarModalNota = false; }
 
   guardarNota() {
     if (this.nuevaNota.titulo) {
-      const claveNueva = this.obtenerClave(this.diaSeleccionado, this.fechaVisual.getMonth(), this.fechaVisual.getFullYear());
+      const clave = this.obtenerClave(this.diaSeleccionado, this.fechaVisual.getMonth(), this.fechaVisual.getFullYear());
 
-      // Combinamos la hora y minutos para el texto visual
-      const horaFormateada = `${this.nuevaNota.hora}:${this.nuevaNota.minutos}`;
+      // Formateo de horas con 2 dígitos (ej: 09:05)
+      let tiempo = `${this.nuevaNota.hora.toString().padStart(2, '0')}:${this.nuevaNota.minutos.toString().padStart(2, '0')}`;
 
-      this.todasLasNotas.push({
+      if (this.nuevaNota.horaFin) {
+        const minF = this.nuevaNota.minutosFin || '00';
+        tiempo += ` - ${this.nuevaNota.horaFin.toString().padStart(2, '0')}:${minF.toString().padStart(2, '0')}`;
+      }
+
+      const nuevaNotaObj = {
         id: Date.now(),
         titulo: this.nuevaNota.titulo,
-        hora: horaFormateada,
-        color: 'bg-amber-500',
-        fechaClave: claveNueva
-      });
+        hora: tiempo,
+        descripcion: this.nuevaNota.descripcion,
+        color: 'bg-blue-600',
+        fechaClave: clave
+      };
 
-      // Limpiamos y cerramos
-      this.nuevaNota = { titulo: '', hora: '09', minutos: '00' };
+      this.todasLasNotas = [...this.todasLasNotas, nuevaNotaObj];
+
+      this.nuevaNota = { titulo: '', hora: '09', minutos: '00', horaFin: '', minutosFin: '', descripcion: '' };
       this.cerrarModal();
     }
   }
 
   eliminarNota(id: number) {
-    this.todasLasNotas = this.todasLasNotas.filter(nota => nota.id !== id);
+    this.todasLasNotas = this.todasLasNotas.filter(n => n.id !== id);
   }
 
   esHoy(dia: number | null): boolean {
@@ -104,5 +109,12 @@ export class Dashboard implements OnInit {
     return dia === this.diaHoy &&
       this.fechaVisual.getMonth() === this.fechaHoy.getMonth() &&
       this.fechaVisual.getFullYear() === this.fechaHoy.getFullYear();
+  }
+
+  tieneNotas(dia: number | null): boolean {
+    if (!dia) return false;
+    // Buscamos si existe alguna nota con la fecha de este día concreto
+    const clave = this.obtenerClave(dia, this.fechaVisual.getMonth(), this.fechaVisual.getFullYear());
+    return this.todasLasNotas.some(nota => nota.fechaClave === clave);
   }
 }
