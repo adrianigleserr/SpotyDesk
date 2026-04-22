@@ -13,6 +13,17 @@ public class Sitio {
     @Column(nullable = false, length = 50)
     private String numeroSitio;
 
+    @Column(length = 50)
+    private String zona;
+
+    public String getZona() {
+        return zona;
+    }
+
+    public void setZona(String zona) {
+        this.zona = zona;
+    }
+
     @Column(length = 100)
     private String svgElementId; // Aquí guardaremos el ID del elemento <rect> o <path> del mapa SVG
 
