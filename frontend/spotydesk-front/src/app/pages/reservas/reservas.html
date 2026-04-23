@@ -1,1 +1,96 @@
-<p>reservas works!</p>
+<div class="max-w-[1000px] mx-auto p-6 space-y-8 animate-fade-in">
+  
+  <div>
+    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Mis Reservas</h2>
+    <p class="text-slate-500 mt-1 text-lg">Consulta tu historial y gestiona tus próximos días en la oficina.</p>
+  </div>
+
+  <div class="flex gap-2 border-b border-slate-200 pb-px overflow-x-auto">
+    <button (click)="cambiarFiltro('proximas')" 
+      [class.border-blue-600]="filtroActivo === 'proximas'" [class.text-blue-600]="filtroActivo === 'proximas'"
+      [class.border-transparent]="filtroActivo !== 'proximas'" [class.text-slate-500]="filtroActivo !== 'proximas'"
+      class="px-6 py-3 font-bold border-b-[3px] hover:text-blue-600 transition-colors whitespace-nowrap outline-none">
+      Próximas
+    </button>
+    <button (click)="cambiarFiltro('pasadas')" 
+      [class.border-slate-800]="filtroActivo === 'pasadas'" [class.text-slate-800]="filtroActivo === 'pasadas'"
+      [class.border-transparent]="filtroActivo !== 'pasadas'" [class.text-slate-500]="filtroActivo !== 'pasadas'"
+      class="px-6 py-3 font-bold border-b-[3px] hover:text-slate-800 transition-colors whitespace-nowrap outline-none">
+      Pasadas
+    </button>
+    <button (click)="cambiarFiltro('canceladas')" 
+      [class.border-red-500]="filtroActivo === 'canceladas'" [class.text-red-500]="filtroActivo === 'canceladas'"
+      [class.border-transparent]="filtroActivo !== 'canceladas'" [class.text-slate-500]="filtroActivo !== 'canceladas'"
+      class="px-6 py-3 font-bold border-b-[3px] hover:text-red-500 transition-colors whitespace-nowrap outline-none">
+      Canceladas
+    </button>
+  </div>
+
+  <div class="space-y-4">
+    @for (reserva of reservasMostradas; track reserva.id) {
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden group hover:border-slate-200 transition-colors">
+        
+        <div class="absolute left-0 top-0 bottom-0 w-2"
+             [class.bg-blue-500]="reserva.estado === 'proximas'"
+             [class.bg-slate-300]="reserva.estado === 'pasadas'"
+             [class.bg-red-400]="reserva.estado === 'canceladas'">
+        </div>
+
+        <div class="flex items-center gap-6 pl-4">
+          <div class="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center shrink-0">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">{{ reserva.diaSemana.substring(0,3) }}</span>
+            <span class="text-xl font-black text-slate-800">{{ reserva.fecha.split(' ')[0] }}</span>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+              {{ reserva.puesto }}
+              @if (reserva.estado === 'proximas') {
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+              }
+            </h3>
+            <p class="text-sm font-medium text-slate-500 mt-0.5">{{ reserva.zona }}</p>
+            <div class="flex items-center gap-1.5 mt-2 text-xs font-bold text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              {{ reserva.hora }}
+            </div>
+          </div>
+        </div>
+
+        @if (reserva.estado === 'proximas') {
+          <div class="flex gap-3 w-full sm:w-auto pl-4 sm:pl-0">
+            <button class="flex-1 sm:flex-none px-4 py-2.5 text-sm font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors outline-none cursor-pointer">
+              Ver en mapa
+            </button>
+            <button (click)="cancelarReserva(reserva.id)" class="flex-1 sm:flex-none px-4 py-2.5 text-sm font-bold text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-colors outline-none cursor-pointer">
+              Cancelar
+            </button>
+          </div>
+        }
+        
+        @if (reserva.estado === 'pasadas') {
+          <span class="px-4 py-2 bg-slate-50 text-slate-500 font-bold text-sm rounded-xl mr-2">Completada</span>
+        }
+        @if (reserva.estado === 'canceladas') {
+          <span class="px-4 py-2 bg-red-50 text-red-500 font-bold text-sm rounded-xl mr-2">Anulada</span>
+        }
+
+      </div>
+    } @empty {
+      <div class="bg-white border-2 border-dashed border-slate-200 rounded-3xl p-12 flex flex-col items-center justify-center text-center">
+        <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800">No hay reservas</h3>
+        <p class="text-slate-500 font-medium mt-1">No tienes reservas {{ filtroActivo }} en este momento.</p>
+        
+        @if (filtroActivo === 'proximas') {
+          <button routerLink="/dashboard" class="mt-6 px-6 py-3 font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-200 transition-all cursor-pointer">
+            Hacer una reserva
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+</div>
