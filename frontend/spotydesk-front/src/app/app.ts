@@ -1,12 +1,19 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { RouterOutlet, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  standalone: true,
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
+  templateUrl: './app.html',  // <-- Apunta a tu app.html
+  styleUrl: './app.css'       // <-- Apunta a tu app.css
 })
-export class App {
-  protected readonly title = signal('spotydesk-front');
+export class App { // Aunque el archivo sea app.ts, la clase suele llamarse AppComponent
+  constructor(public router: Router) {}
+
+  esRutaPublica(): boolean {
+    const rutasPublicas = ['/login', '/registro', '/recuperar-clave', '/'];
+    return rutasPublicas.includes(this.router.url);
+  }
 }
