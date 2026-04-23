@@ -7,8 +7,9 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div routerLink="/dashboard"
-          class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-all cursor-pointer group">
+
+        <div routerLink="/empresa"
+          class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-200 transition-all cursor-pointer group">
           <div
             class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -20,23 +21,24 @@
             </svg>
           </div>
           <h3 class="text-xl font-bold text-slate-800 mb-2">Reserva de Puestos</h3>
-          <p class="text-slate-500 leading-relaxed text-sm font-medium">Accede al mapa interactivo SVG para reservar
-            tu sitio de hoy.</p>
+          <p class="text-slate-500 text-sm font-medium">Accede al mapa interactivo SVG para reservar tu sitio de hoy.
+          </p>
         </div>
 
-        <div
-          class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 opacity-60 hover:opacity-100 transition-all cursor-not-allowed">
-          <div class="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor">
+        <div routerLink="/reservas"
+          class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-200 transition-all cursor-pointer group">
+          <div
+            class="w-12 h-12 bg-slate-100 group-hover:bg-blue-50 rounded-2xl flex items-center justify-center text-slate-500 group-hover:text-blue-600 mb-6 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:scale-110 transition-transform"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           <h3 class="text-xl font-bold text-slate-800 mb-2">Mis Reservas</h3>
-          <p class="text-slate-500 leading-relaxed text-sm font-medium">Consulta el historial y gestiona tus citas
-            activas.</p>
+          <p class="text-slate-500 text-sm font-medium">Consulta el historial y gestiona tus citas activas.</p>
         </div>
+
       </div>
 
       <div
