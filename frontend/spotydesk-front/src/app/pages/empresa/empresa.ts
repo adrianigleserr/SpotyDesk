@@ -48,4 +48,28 @@ export class Empresa {
     { nombre: 'Marketing y Ventas', puestos: 20, color: 'bg-amber-500' },
     { nombre: 'Recursos Humanos', puestos: 8, color: 'bg-emerald-500' }
   ];
+
+  // ... tu código anterior (oficina, estadisticas, zonas) ...
+
+  // Base de datos simulada de compañeros
+  empleados = [
+    { nombre: 'Alejo', apellidos: 'García', reserva: 'Puesto 42', avatar: 'https://ui-avatars.com/api/?name=Alejo+Garcia&background=0D8ABC&color=fff' },
+    { nombre: 'María', apellidos: 'López', reserva: 'Puesto 12', avatar: 'https://ui-avatars.com/api/?name=Maria+Lopez&background=8B5CF6&color=fff' },
+    { nombre: 'Carlos', apellidos: 'Ruiz', reserva: 'Puesto 05', avatar: 'https://ui-avatars.com/api/?name=Carlos+Ruiz&background=10B981&color=fff' },
+    { nombre: 'Laura', apellidos: 'Gómez', reserva: 'Sala de Reuniones A', avatar: 'https://ui-avatars.com/api/?name=Laura+Gomez&background=F59E0B&color=fff' },
+    
+    // Estos no tienen reserva hoy
+    { nombre: 'David', apellidos: 'Martínez', reserva: null, avatar: 'https://ui-avatars.com/api/?name=David+Martinez&background=64748B&color=fff' },
+    { nombre: 'Sofía', apellidos: 'Hernández', reserva: null, avatar: 'https://ui-avatars.com/api/?name=Sofia+Hernandez&background=64748B&color=fff' },
+    { nombre: 'Hugo', apellidos: 'Fernández', reserva: null, avatar: 'https://ui-avatars.com/api/?name=Hugo+Fernandez&background=64748B&color=fff' }
+  ];
+
+  // Filtros automáticos
+  get empleadosEnOficina() {
+    return this.empleados.filter(emp => emp.reserva !== null);
+  }
+
+  get empleadosEnRemoto() {
+    return this.empleados.filter(emp => emp.reserva === null);
+  }
 }
