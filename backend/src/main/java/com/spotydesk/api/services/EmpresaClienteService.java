@@ -28,4 +28,9 @@ public class EmpresaClienteService {
     public List<EmpresaCliente> listarEmpresas() {
         return repository.findAll();
     }
+
+    // Método para buscar por ID
+    public Optional<EmpresaCliente> buscarPorId(Long id) {
+        return repository.findById(id);
+    }
 }

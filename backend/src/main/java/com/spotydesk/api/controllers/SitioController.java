@@ -24,4 +24,9 @@ public class SitioController {
     public Sitio registrarSitio(@RequestBody Sitio sitio) {
         return service.crearSitio(sitio);
     }
+
+    @GetMapping("/empresa/{idEmpresa}")
+    public List<Sitio> obtenerPorEmpresa(@PathVariable Long idEmpresa) {
+        return service.obtenerSitiosPorEmpresa(idEmpresa);
+    }
 }

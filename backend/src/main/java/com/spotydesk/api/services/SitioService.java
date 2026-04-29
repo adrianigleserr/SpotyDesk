@@ -15,6 +15,10 @@ public class SitioService {
         return repository.findAll();
     }
 
+    public List<Sitio> obtenerSitiosPorEmpresa(Long idEmpresa) {
+        return repository.findByEmpresaIdEmpresa(idEmpresa);
+    }
+
     public Sitio crearSitio(Sitio sitio) {
         return repository.save(sitio);
     }

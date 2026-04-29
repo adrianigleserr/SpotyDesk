@@ -3,7 +3,7 @@ package com.spotydesk.api.services;
 import com.spotydesk.api.models.Empleado;
 import com.spotydesk.api.repositories.EmpleadoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder; // NUEVO IMPORT
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,6 +35,10 @@ public class EmpleadoService {
             throw new RuntimeException("Contraseña incorrecta");
         }
 
-        return empleado;
+        return empleado; // Esto vuelve a estar en su sitio correcto
+    }
+
+    public List<Empleado> obtenerEmpleadosPorEmpresa(Long idEmpresa) {
+        return repository.findByEmpresaIdEmpresa(idEmpresa);
     }
 }
