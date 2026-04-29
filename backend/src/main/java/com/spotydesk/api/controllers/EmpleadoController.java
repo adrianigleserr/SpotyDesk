@@ -24,4 +24,9 @@ public class EmpleadoController {
     public Empleado registrarEmpleado(@RequestBody Empleado empleado) {
         return service.crearEmpleado(empleado);
     }
+
+    @GetMapping("/empresa/{idEmpresa}")
+    public List<Empleado> obtenerPorEmpresa(@PathVariable Long idEmpresa) {
+        return service.obtenerEmpleadosPorEmpresa(idEmpresa);
+    }
 }

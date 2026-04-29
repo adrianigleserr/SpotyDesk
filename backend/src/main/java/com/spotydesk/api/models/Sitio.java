@@ -11,21 +11,23 @@ public class Sitio {
     private Long idSitio;
 
     @Column(nullable = false, length = 50)
-    private String numeroSitio;
+    private String numeroSitio; // Ej: "P1", "P2"
 
     @Column(length = 50)
     private String zona;
 
-    public String getZona() {
-        return zona;
-    }
+    // --- NUEVOS CAMPOS PARA LA MATRIZ ---
 
-    public void setZona(String zona) {
-        this.zona = zona;
-    }
+    @Column(name = "posicion_matriz")
+    private Integer posicionMatriz; // El número de celda en la cuadrícula (1 al 40)
 
-    @Column(length = 100)
-    private String svgElementId; // Aquí guardaremos el ID del elemento <rect> o <path> del mapa SVG
+    @Column(length = 20)
+    private String tipo; // "puesto" (botón verde/gris) o "pasillo" (hueco en blanco)
+
+    // Nota: El 'estado' (libre/ocupado) no se guarda en el sitio,
+    // dependerá de si tiene una Reserva asociada para el día de hoy.
+
+    // ------------------------------------
 
     // Relación N:1 -> Muchos sitios pertenecen a una empresa
     @ManyToOne
@@ -51,12 +53,28 @@ public class Sitio {
         this.numeroSitio = numeroSitio;
     }
 
-    public String getSvgElementId() {
-        return svgElementId;
+    public String getZona() {
+        return zona;
     }
 
-    public void setSvgElementId(String svgElementId) {
-        this.svgElementId = svgElementId;
+    public void setZona(String zona) {
+        this.zona = zona;
+    }
+
+    public Integer getPosicionMatriz() {
+        return posicionMatriz;
+    }
+
+    public void setPosicionMatriz(Integer posicionMatriz) {
+        this.posicionMatriz = posicionMatriz;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
     public EmpresaCliente getEmpresa() {
@@ -66,5 +84,4 @@ public class Sitio {
     public void setEmpresa(EmpresaCliente empresa) {
         this.empresa = empresa;
     }
-
 }
