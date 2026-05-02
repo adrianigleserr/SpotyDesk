@@ -19,31 +19,54 @@ public class ReservaService {
 
     public Reserva crearReserva(Reserva reserva) {
 
-        // 1. Validar si está reservando un Sitio
+        // 1. VALIDAR: ¿El empleado ya tiene una reserva en ese horario?
+        if (reserva.getEmpleado() != null) {
+            boolean empleadoOcupado = repository.isEmpleadoOcupado(
+                    reserva.getEmpleado().getIdEmpleado(),
+                    reserva.getFechaInicio(),
+                    reserva.getFechaFin());
+            if (empleadoOcupado) {
+                throw new RuntimeException("ERROR_DOBLE_RESERVA"); // Lanzamos un error muy claro
+            }
+        }
+
+        // 2. VALIDAR: ¿El sitio ya está ocupado por otra persona en ese horario?
         if (reserva.getSitio() != null) {
-            boolean ocupado = repository.isSitioOcupado(
+            boolean sitioOcupado = repository.isSitioOcupado(
                     reserva.getSitio().getIdSitio(),
                     reserva.getFechaInicio(),
                     reserva.getFechaFin());
-            if (ocupado) {
-                // Detiene la ejecución y lanza un error
+            if (sitioOcupado) {
                 throw new RuntimeException("El sitio ya está reservado en ese horario.");
             }
         }
 
-        // 2. Validar si está reservando una Sala
+        // 3. VALIDAR: ¿La sala ya está ocupada?
         if (reserva.getSala() != null) {
-            boolean ocupada = repository.isSalaOcupada(
+            boolean salaOcupada = repository.isSalaOcupada(
                     reserva.getSala().getIdSala(),
                     reserva.getFechaInicio(),
                     reserva.getFechaFin());
-            if (ocupada) {
-                // Detiene la ejecución y lanza un error
+            if (salaOcupada) {
                 throw new RuntimeException("La sala ya está reservada en ese horario.");
             }
         }
 
-        // 3. Si pasa todas las validaciones, se guarda en la BBDD
+        return repository.save(reserva);
+    }
+
+    public List<Reserva> obtenerPorEmpresa(Long idEmpresa) {
+        return repository.findByEmpresaId(idEmpresa);
+    }
+
+    public List<Reserva> obtenerPorEmpleado(Long idEmpleado) {
+        return repository.findByEmpleadoId(idEmpleado);
+    }
+
+    public Reserva cancelarReserva(Long idReserva) {
+        Reserva reserva = repository.findById(idReserva)
+                .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+        reserva.setEstado("Cancelada");
         return repository.save(reserva);
     }
 }

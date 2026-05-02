@@ -24,4 +24,9 @@ public class ReservaController {
     public Reserva registrarReserva(@RequestBody Reserva reserva) {
         return service.crearReserva(reserva);
     }
+
+    @GetMapping("/empresa/{idEmpresa}")
+    public List<Reserva> obtenerPorEmpresa(@PathVariable Long idEmpresa) {
+        return service.obtenerPorEmpresa(idEmpresa);
+    }
 }
