@@ -22,7 +22,6 @@ export class Empresa implements OnInit {
 
   zonas = [{ nombre: 'Planta Principal', puestos: 40, color: 'bg-blue-500' }];
 
-  // Nuevas variables para gestionar fechas y datos en crudo
   diasDisponibles: any[] = [];
   fechaSeleccionada: Date = new Date();
   
@@ -33,6 +32,9 @@ export class Empresa implements OnInit {
   empleados: any[] = [];
   puestosTablero: any[] = [];
   columnas = 8;
+  
+  idEmpleadoActual: number | null = null;
+  idEmpresaActual: number | null = null;
 
   ngOnInit() {
     this.generarDiasLaborables();
@@ -40,18 +42,18 @@ export class Empresa implements OnInit {
     const usuarioJSON = localStorage.getItem('usuarioSpotyDesk');
     if (usuarioJSON) {
       const usuario = JSON.parse(usuarioJSON);
-      this.cargarDatos(usuario.idEmpresa);
+      this.idEmpleadoActual = usuario.idEmpleado;
+      this.idEmpresaActual = usuario.idEmpresa;
+      this.cargarDatos(this.idEmpresaActual!);
     }
   }
 
-  // Genera los próximos 7 días laborables
   generarDiasLaborables() {
     const hoy = new Date();
     let diasAgregados = 0;
     let diaActual = new Date(hoy);
 
     while (diasAgregados < 7) {
-      // 0 es Domingo, 6 es Sábado
       if (diaActual.getDay() !== 0 && diaActual.getDay() !== 6) {
         this.diasDisponibles.push({
           fechaObject: new Date(diaActual),
@@ -93,30 +95,33 @@ export class Empresa implements OnInit {
         
         this.http.get(`http://localhost:8080/api/empleados/empresa/${idEmp}`).subscribe((emps: any) => {
           this.datosEmpleados = emps;
-          this.actualizarVistas(); // Dibuja el mapa para el día seleccionado
+          this.actualizarVistas();
         });
       });
     });
   }
 
   actualizarVistas() {
-    // 1. Filtrar las reservas que tocan en el día seleccionado
-    const reservasDelDia = this.datosReservas.filter((r: any) => this.esMismaFecha(r.fechaInicio, this.fechaSeleccionada));
+    const reservasDelDia = this.datosReservas.filter((r: any) => 
+      this.esMismaFecha(r.fechaInicio, this.fechaSeleccionada) && r.estado === 'Activa'
+    );
 
-    // 2. Dibujar el mapa
     this.puestosTablero = this.datosSitios.map((s: any) => {
       const r = reservasDelDia.find((res: any) => res.sitio && res.sitio.idSitio === s.idSitio);
+      const esMio = r && r.empleado && r.empleado.idEmpleado === this.idEmpleadoActual;
+      
       return {
         id: s.idSitio,
         nombre: s.numeroSitio,
         tipo: s.tipo,
         estado: r ? 'ocupado' : 'libre',
         ocupante: r ? r.empleado.nombre + " " + r.empleado.apellido1 : null,
+        mio: esMio,
+        idReserva: r ? r.idReserva : null,
         recomendado: false
       };
     });
 
-    // 3. Dibujar listas de empleados
     this.empleados = this.datosEmpleados.map((e: any) => {
       const reservaDelEmpleado = reservasDelDia.find((r: any) => r.empleado && r.empleado.idEmpleado === e.idEmpleado);
       return {
@@ -133,18 +138,31 @@ export class Empresa implements OnInit {
   }
 
   reservarAsiento(celda: any) {
-    if (celda.tipo !== 'puesto' || celda.estado === 'ocupado') return;
+    if (celda.tipo !== 'puesto') return;
 
-    const usuarioJSON = localStorage.getItem('usuarioSpotyDesk');
-    if (!usuarioJSON) return;
-    const usuario = JSON.parse(usuarioJSON);
-
-    if (!usuario.idEmpleado) {
-      alert('Tu usuario no tiene un ID asignado en el navegador. No se puede reservar.');
+    if (!this.idEmpleadoActual || !this.idEmpresaActual) {
+      alert('Error de sesión. Vuelve a iniciar sesión.');
       return;
     }
 
-    // Creamos la reserva con la FECHA SELECCIONADA
+    if (celda.mio && celda.idReserva) {
+      if (confirm('¿Quieres dejar libre este asiento?')) {
+        this.http.put(`http://localhost:8080/api/reservas/${celda.idReserva}/cancelar`, {}).subscribe({
+          next: () => this.cargarDatos(this.idEmpresaActual!),
+          error: () => alert('Error al liberar el asiento.')
+        });
+      }
+      return;
+    }
+
+    if (celda.estado === 'ocupado') return;
+
+    const yaTengoSitio = this.puestosTablero.some(p => p.mio);
+    if (yaTengoSitio) {
+      alert('Ya tienes un asiento reservado. Haz clic en tu asiento actual para liberarlo antes de elegir otro.');
+      return;
+    }
+
     const año = this.fechaSeleccionada.getFullYear();
     const mes = String(this.fechaSeleccionada.getMonth() + 1).padStart(2, '0');
     const dia = String(this.fechaSeleccionada.getDate()).padStart(2, '0');
@@ -156,24 +174,25 @@ export class Empresa implements OnInit {
       fechaInicio: fechaInicio,
       fechaFin: fechaFin,
       estado: 'Activa',
-      empleado: { idEmpleado: usuario.idEmpleado },
+      empleado: { idEmpleado: this.idEmpleadoActual },
       sitio: { idSitio: celda.id }
     };
 
     this.http.post('http://localhost:8080/api/reservas', nuevaReserva).subscribe({
       next: () => {
-        // Al reservar con éxito, recargamos los datos para ver nuestro nuevo sitio
-        this.cargarDatos(usuario.idEmpresa);
+        this.cargarDatos(this.idEmpresaActual!);
       },
       error: (err) => {
-        alert('No se pudo reservar. Asegúrate de no tener ya otra reserva en este mismo día.');
+        alert('No se pudo completar la reserva.');
       }
     });
   }
 
   ejecutarIAProximidad() {
     this.puestosTablero.forEach((p, i) => {
-      if (p.estado === 'ocupado') {
+      // AQUÍ ESTÁ EL CAMBIO CLAVE:
+      // Solo recomendamos si está ocupado Y NO es tu asiento (!p.mio)
+      if (p.estado === 'ocupado' && !p.mio) {
         const vecinos = [i - 1, i + 1, i - 8, i + 8];
         vecinos.forEach(v => {
           if (v >= 0 && v < this.puestosTablero.length) {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -6,11 +6,30 @@ import { CommonModule } from '@angular/common';
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
-  templateUrl: './app.html',  // <-- Apunta a tu app.html
-  styleUrl: './app.css'       // <-- Apunta a tu app.css
+  templateUrl: './app.html',
+  styleUrl: './app.css'
 })
-export class App { // Aunque el archivo sea app.ts, la clase suele llamarse AppComponent
+export class App implements OnInit {
+  nombreUsuario: string = 'Invitado';
+  avatarUrl: string = '';
+
   constructor(public router: Router) {}
+
+  ngOnInit() {
+    this.cargarUsuario();
+  }
+
+  cargarUsuario() {
+    const usuarioJSON = localStorage.getItem('usuarioSpotyDesk');
+    if (usuarioJSON) {
+      const usuario = JSON.parse(usuarioJSON);
+      this.nombreUsuario = usuario.nombre || 'Usuario';
+      
+      // Creamos la URL del avatar con las iniciales y un color de fondo aleatorio
+      const apellido = usuario.apellido1 || usuario.apellidos || '';
+      this.avatarUrl = `https://ui-avatars.com/api/?name=${this.nombreUsuario}+${apellido}&background=random&color=fff&bold=true`;
+    }
+  }
 
   esRutaPublica(): boolean {
     const rutasPublicas = ['/login', '/registro', '/recuperar-clave', '/'];

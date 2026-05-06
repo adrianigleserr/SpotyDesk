@@ -110,14 +110,16 @@
                 <button
                   (click)="reservarAsiento(celda)"
                   [class.bg-emerald-500]="celda.estado === 'libre' && !celda.recomendado"
-                  [class.bg-amber-400]="celda.recomendado"
-                  [class.ring-4]="celda.recomendado"
-                  [class.ring-amber-200]="celda.recomendado"
-                  [class.bg-slate-300]="celda.estado === 'ocupado'"
-                  [class.cursor-not-allowed]="celda.estado === 'ocupado'"
-                  class="aspect-square rounded-lg shadow-sm flex flex-col items-center justify-center text-[10px] sm:text-xs font-bold text-white transition-transform hover:scale-105 active:scale-95 group relative"
+                  [class.bg-amber-400]="celda.recomendado && !celda.mio"
+                  [class.ring-4]="celda.recomendado && !celda.mio"
+                  [class.ring-amber-200]="celda.recomendado && !celda.mio"
+                  [class.bg-blue-600]="celda.mio"
+                  [class.hover:bg-red-500]="celda.mio"
+                  [class.bg-slate-300]="celda.estado === 'ocupado' && !celda.mio"
+                  [class.cursor-not-allowed]="celda.estado === 'ocupado' && !celda.mio"
+                  class="aspect-square rounded-lg shadow-sm flex flex-col items-center justify-center text-[10px] sm:text-xs font-bold text-white transition-all hover:scale-105 active:scale-95 group relative"
                 >
-                  @if (celda.recomendado) {
+                  @if (celda.recomendado && !celda.mio) {
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       class="h-3 w-3 mb-0.5"
@@ -136,11 +138,13 @@
                     class="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-2 py-1 rounded text-[10px] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20"
                   >
                     {{
-                      celda.estado === 'ocupado'
-                        ? 'Ocupado por ' + celda.ocupante
-                        : celda.recomendado
-                          ? 'Sugerido por IA'
-                          : 'Click para Reservar'
+                      celda.mio
+                        ? 'Tu sitio (Click para liberar)'
+                        : celda.estado === 'ocupado'
+                          ? 'Ocupado por ' + celda.ocupante
+                          : celda.recomendado
+                            ? 'Sugerido por IA'
+                            : 'Click para Reservar'
                     }}
                   </span>
                 </button>
@@ -152,7 +156,7 @@
             }
           </div>
 
-          <div class="flex justify-center flex-wrap gap-6 mt-8 pt-4 w-full">
+          <div class="flex justify-center flex-wrap gap-4 mt-8 pt-4 w-full">
             <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
               <div class="w-3 h-3 rounded bg-emerald-500"></div>
               Libre
@@ -160,6 +164,10 @@
             <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
               <div class="w-3 h-3 rounded bg-amber-400 ring-2 ring-amber-100"></div>
               Recomendado IA
+            </div>
+            <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+              <div class="w-3 h-3 rounded bg-blue-600"></div>
+              Tu asiento
             </div>
             <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
               <div class="w-3 h-3 rounded bg-slate-300"></div>
