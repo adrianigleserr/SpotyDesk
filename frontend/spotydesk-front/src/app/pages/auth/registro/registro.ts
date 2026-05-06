@@ -1,23 +1,23 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http'; // Añadido
-import { FormsModule } from '@angular/forms'; // Añadido para el ngModel
-import { CommonModule } from '@angular/common'; // Añadido para mostrar errores
+import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule], // Actualizado
+  imports: [RouterLink, FormsModule, CommonModule],
   templateUrl: './registro.html',
   styleUrl: './registro.css'
 })
 export class Registro {
   private router = inject(Router);
-  private http = inject(HttpClient); // Inyectamos el servicio HTTP
+  private http = inject(HttpClient);
 
   // Variables para el formulario
   nombre: string = '';
-  apellidos: string = '';
+  apellidos: string = ''; // Lo mantenemos en plural aquí por compatibilidad con el Backend
   nombreEmpresa: string = '';
   correo: string = '';
   password: string = '';
@@ -27,7 +27,6 @@ export class Registro {
   registrarUsuario() {
     this.mensajeError = '';
 
-    // Este objeto tiene que ser igual a tu RegistroRequest.java del backend
     const datosRegistro = {
       nombre: this.nombre,
       apellidos: this.apellidos,
@@ -46,7 +45,6 @@ export class Registro {
       },
       error: (err) => {
         console.error('Error al registrar:', err);
-        // Capturamos el error de tu ManejadorDeErrores.java
         this.mensajeError = err.error?.error || 'Error en el servidor. Inténtalo más tarde.';
       }
     });

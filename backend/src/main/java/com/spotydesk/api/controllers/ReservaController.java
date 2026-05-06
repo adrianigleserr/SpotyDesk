@@ -29,4 +29,14 @@ public class ReservaController {
     public List<Reserva> obtenerPorEmpresa(@PathVariable Long idEmpresa) {
         return service.obtenerPorEmpresa(idEmpresa);
     }
+
+    @GetMapping("/empleado/{idEmpleado}")
+    public List<Reserva> obtenerPorEmpleado(@PathVariable Long idEmpleado) {
+        return service.obtenerPorEmpleado(idEmpleado);
+    }
+
+    @PutMapping("/{idReserva}/cancelar")
+    public Reserva cancelarReserva(@PathVariable Long idReserva) {
+        return service.cancelarReserva(idReserva);
+    }
 }
