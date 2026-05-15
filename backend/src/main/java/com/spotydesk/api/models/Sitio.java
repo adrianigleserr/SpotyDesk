@@ -17,7 +17,8 @@ public class Sitio {
     private String zona;
 
     // --- NUEVOS CAMPOS PARA LA MATRIZ ---
-
+    @Column(nullable = false)
+    private Integer capacidad; // 1 para puestos, 4-8 para salas, 0 para pasillos
     @Column(name = "posicion_matriz")
     private Integer posicionMatriz; // El número de celda en la cuadrícula (1 al 40)
 
@@ -83,5 +84,13 @@ public class Sitio {
 
     public void setEmpresa(EmpresaCliente empresa) {
         this.empresa = empresa;
+    }
+
+    public Integer getCapacidad() {
+        return capacidad;
+    }
+
+    public void setCapacidad(Integer capacidad) {
+        this.capacidad = capacidad;
     }
 }

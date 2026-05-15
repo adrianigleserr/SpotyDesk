@@ -15,8 +15,8 @@ export class Empresa implements OnInit {
   oficina: any = { nombre: 'Cargando...', ubicacion: '...', horario: '08:00 - 20:00', aforoMaximo: 40 };
   
   estadisticas = [
-    { titulo: 'Puestos Totales', valor: '40', icono: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', colorTexto: 'text-blue-600', colorFondo: 'bg-blue-50' },
-    { titulo: 'Salas de Reunión', valor: '2', icono: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', colorTexto: 'text-indigo-600', colorFondo: 'bg-indigo-50' },
+    { titulo: 'Puestos Totales', valor: '0', icono: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', colorTexto: 'text-blue-600', colorFondo: 'bg-blue-50' },
+    { titulo: 'Salas de Reunión', valor: '0', icono: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', colorTexto: 'text-indigo-600', colorFondo: 'bg-indigo-50' },
     { titulo: 'Ocupación', valor: '0%', icono: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', colorTexto: 'text-emerald-600', colorFondo: 'bg-emerald-50' }
   ];
 
@@ -46,6 +46,76 @@ export class Empresa implements OnInit {
       this.idEmpresaActual = usuario.idEmpresa;
       this.cargarDatos(this.idEmpresaActual!);
     }
+  }
+
+  generarPlanoPorDefecto() {
+    if (!this.idEmpresaActual) return;
+
+    // Aquí "dibujamos" el mapa. La cuadrícula va rellenando de izquierda a derecha.
+    // Capacidad 4 = Sala 2x2. Capacidad 8 = Sala 3x2.
+    const layout = [
+      // Fila 1 (Arriba del todo)
+      { num: 'Sala S1', tipo: 'sala', cap: 1 },
+      { num: 'P-01', tipo: 'puesto', cap: 1 },
+      { num: 'P-02', tipo: 'puesto', cap: 1 },
+      { num: 'Pasillo', tipo: 'pasillo', cap: 0 },
+      { num: 'P-03', tipo: 'puesto', cap: 1 },
+      { num: 'P-04', tipo: 'puesto', cap: 1 },
+      { num: 'P-05', tipo: 'puesto', cap: 1 },
+      { num: 'Sala S2', tipo: 'sala', cap: 1 },
+
+      // Fila 2
+      { num: 'P-06', tipo: 'puesto', cap: 1 },
+      { num: 'Sala 2x2', tipo: 'sala', cap: 4 }, // <-- Esta ocupará 2x2 huecos
+      { num: 'Pasillo', tipo: 'pasillo', cap: 0 },
+      { num: 'P-07', tipo: 'puesto', cap: 1 },
+      { num: 'P-08', tipo: 'puesto', cap: 1 },
+      { num: 'P-09', tipo: 'puesto', cap: 1 },
+      { num: 'P-10', tipo: 'puesto', cap: 1 },
+
+      // Fila 3
+      { num: 'P-11', tipo: 'puesto', cap: 1 },
+      { num: 'Pasillo', tipo: 'pasillo', cap: 0 },
+      { num: 'Sala 3x2', tipo: 'sala', cap: 8 }, // <-- Esta ocupará 3x2 huecos
+      { num: 'P-12', tipo: 'puesto', cap: 1 },
+
+      // Fila 4
+      { num: 'P-13', tipo: 'puesto', cap: 1 },
+      { num: 'P-14', tipo: 'puesto', cap: 1 },
+      { num: 'P-15', tipo: 'puesto', cap: 1 },
+      { num: 'Pasillo', tipo: 'pasillo', cap: 0 },
+      { num: 'P-16', tipo: 'puesto', cap: 1 },
+
+      // Fila 5 (Abajo del todo)
+      { num: 'P-17', tipo: 'puesto', cap: 1 },
+      { num: 'P-18', tipo: 'puesto', cap: 1 },
+      { num: 'P-19', tipo: 'puesto', cap: 1 },
+      { num: 'Pasillo', tipo: 'pasillo', cap: 0 },
+      { num: 'P-20', tipo: 'puesto', cap: 1 },
+      { num: 'P-21', tipo: 'puesto', cap: 1 },
+      { num: 'P-22', tipo: 'puesto', cap: 1 },
+      { num: 'P-23', tipo: 'puesto', cap: 1 },
+    ];
+
+    layout.forEach((item, index) => {
+      const nuevoSitio = {
+        numeroSitio: item.num,
+        posicionMatriz: index,
+        tipo: item.tipo,
+        capacidad: item.cap,
+        zona: 'Planta Principal',
+        empresa: { idEmpresa: this.idEmpresaActual }
+      };
+
+      this.http.post('http://localhost:8080/api/sitios', nuevoSitio).subscribe({
+        next: () => {
+          // Si es el último en guardarse, recargamos la pantalla
+          if (index === layout.length - 1) {
+            this.cargarDatos(this.idEmpresaActual!);
+          }
+        }
+      });
+    });
   }
 
   generarDiasLaborables() {
@@ -114,6 +184,7 @@ export class Empresa implements OnInit {
         id: s.idSitio,
         nombre: s.numeroSitio,
         tipo: s.tipo,
+        capacidad: s.capacidad,
         estado: r ? 'ocupado' : 'libre',
         ocupante: r ? r.empleado.nombre + " " + r.empleado.apellido1 : null,
         mio: esMio,
@@ -127,7 +198,7 @@ export class Empresa implements OnInit {
       return {
         nombre: e.nombre,
         apellidos: e.apellido1,
-        reserva: reservaDelEmpleado && reservaDelEmpleado.sitio ? `Puesto ${reservaDelEmpleado.sitio.numeroSitio}` : null, 
+        reserva: reservaDelEmpleado && reservaDelEmpleado.sitio ? `${reservaDelEmpleado.sitio.tipo === 'sala' ? 'Sala' : 'Puesto'} ${reservaDelEmpleado.sitio.numeroSitio.replace('P-', '')}` : null, 
         avatar: `https://ui-avatars.com/api/?name=${e.nombre}+${e.apellido1}&background=0D8ABC&color=fff`
       };
     });
@@ -138,7 +209,7 @@ export class Empresa implements OnInit {
   }
 
   reservarAsiento(celda: any) {
-    if (celda.tipo !== 'puesto') return;
+    if (celda.tipo === 'pasillo') return;
 
     if (!this.idEmpleadoActual || !this.idEmpresaActual) {
       alert('Error de sesión. Vuelve a iniciar sesión.');
@@ -146,10 +217,10 @@ export class Empresa implements OnInit {
     }
 
     if (celda.mio && celda.idReserva) {
-      if (confirm('¿Quieres dejar libre este asiento?')) {
+      if (confirm(`¿Quieres dejar libre este ${celda.tipo}?`)) {
         this.http.put(`http://localhost:8080/api/reservas/${celda.idReserva}/cancelar`, {}).subscribe({
           next: () => this.cargarDatos(this.idEmpresaActual!),
-          error: () => alert('Error al liberar el asiento.')
+          error: () => alert('Error al liberar.')
         });
       }
       return;
@@ -159,7 +230,7 @@ export class Empresa implements OnInit {
 
     const yaTengoSitio = this.puestosTablero.some(p => p.mio);
     if (yaTengoSitio) {
-      alert('Ya tienes un asiento reservado. Haz clic en tu asiento actual para liberarlo antes de elegir otro.');
+      alert('Ya tienes una reserva. Haz clic en ella para liberarla antes de elegir otra.');
       return;
     }
 
@@ -182,7 +253,7 @@ export class Empresa implements OnInit {
       next: () => {
         this.cargarDatos(this.idEmpresaActual!);
       },
-      error: (err) => {
+      error: () => {
         alert('No se pudo completar la reserva.');
       }
     });
@@ -190,9 +261,7 @@ export class Empresa implements OnInit {
 
   ejecutarIAProximidad() {
     this.puestosTablero.forEach((p, i) => {
-      // AQUÍ ESTÁ EL CAMBIO CLAVE:
-      // Solo recomendamos si está ocupado Y NO es tu asiento (!p.mio)
-      if (p.estado === 'ocupado' && !p.mio) {
+      if (p.estado === 'ocupado' && !p.mio && p.tipo === 'puesto') {
         const vecinos = [i - 1, i + 1, i - 8, i + 8];
         vecinos.forEach(v => {
           if (v >= 0 && v < this.puestosTablero.length) {
@@ -207,9 +276,15 @@ export class Empresa implements OnInit {
   }
 
   calcularEstadisticas() {
-    const puestos = this.puestosTablero.filter(p => p.tipo === 'puesto');
-    const ocupados = puestos.filter(p => p.estado === 'ocupado').length;
-    this.estadisticas[2].valor = Math.round((ocupados / puestos.length) * 100) + '%';
+    const puestos = this.datosSitios.filter(s => s.tipo === 'puesto').length;
+    const salas = this.datosSitios.filter(s => s.tipo === 'sala').length;
+    const ocupados = this.puestosTablero.filter(p => p.estado === 'ocupado').length;
+
+    this.estadisticas[0].valor = puestos.toString();
+    this.estadisticas[1].valor = salas.toString();
+    
+    const totalSitios = puestos + salas;
+    this.estadisticas[2].valor = totalSitios > 0 ? Math.round((ocupados / totalSitios) * 100) + '%' : '0%';
   }
 
   get empleadosEnOficina() { return this.empleados.filter(e => e.reserva !== null); }

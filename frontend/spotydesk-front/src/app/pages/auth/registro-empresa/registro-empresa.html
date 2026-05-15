@@ -1,0 +1,69 @@
+<div class="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div
+    class="max-w-md w-full space-y-8 bg-white p-10 rounded-3xl shadow-xl border border-slate-100"
+  >
+    <div class="text-center">
+      <div
+        class="mx-auto h-12 w-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-extrabold text-2xl"
+      >
+        S
+      </div>
+      <h2 class="mt-4 text-2xl font-extrabold text-slate-900">Registra tu Empresa</h2>
+      <p class="text-slate-500 text-sm mt-2">
+        Da de alta tu organización para empezar a gestionar puestos.
+      </p>
+    </div>
+
+    <form class="mt-8 space-y-6">
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Nombre de la Empresa</label>
+        <input
+          type="text"
+          [(ngModel)]="nombreEmpresa"
+          name="nombreEmpresa"
+          placeholder="Ej: Tech Solutions S.L."
+          class="w-full px-4 py-2 mt-1 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Dominio Corporativo</label>
+        <input
+          type="text"
+          [(ngModel)]="dominio"
+          name="dominio"
+          placeholder="Ej: techsolutions.com"
+          class="w-full px-4 py-2 mt-1 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+        />
+        <p class="text-[10px] text-slate-400 mt-2 italic">
+          Esto servirá para validar los correos de tus empleados.
+        </p>
+      </div>
+
+      @if (mensajeError) {
+        <div
+          class="bg-red-50 text-red-600 p-3 rounded-lg text-xs font-bold text-center border border-red-100"
+        >
+          {{ mensajeError }}
+        </div>
+      }
+
+      <button
+        (click)="registrar()"
+        type="button"
+        class="w-full py-3 px-4 font-bold rounded-xl text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all cursor-pointer"
+      >
+        Dar de alta empresa
+      </button>
+
+      <div class="text-center">
+        <a
+          routerLink="/registro"
+          class="text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors"
+        >
+          Volver al registro de empleado
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
