@@ -25,14 +25,13 @@ export class App implements OnInit {
       const usuario = JSON.parse(usuarioJSON);
       this.nombreUsuario = usuario.nombre || 'Usuario';
       
-      // Creamos la URL del avatar con las iniciales y un color de fondo aleatorio
       const apellido = usuario.apellido1 || usuario.apellidos || '';
       this.avatarUrl = `https://ui-avatars.com/api/?name=${this.nombreUsuario}+${apellido}&background=random&color=fff&bold=true`;
     }
   }
 
   esRutaPublica(): boolean {
-    const rutasPublicas = ['/login', '/registro', '/recuperar-clave', '/'];
+    const rutasPublicas = ['/login', '/registro', '/registro-empresa', '/recuperar-clave', '/'];
     return rutasPublicas.includes(this.router.url);
   }
 }

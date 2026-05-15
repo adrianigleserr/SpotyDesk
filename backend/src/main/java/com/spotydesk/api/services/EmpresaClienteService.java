@@ -4,33 +4,47 @@ import com.spotydesk.api.models.EmpresaCliente;
 import com.spotydesk.api.repositories.EmpresaClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
-import java.util.List;
 
-@Service // Le dice a Spring que esta clase contiene la lógica de negocio
+import java.util.List;
+import java.util.Optional;
+
+@Service
 public class EmpresaClienteService {
 
-    @Autowired // Inyecta el repositorio automáticamente para que podamos usarlo
+    @Autowired
     private EmpresaClienteRepository repository;
 
-    // Método para guardar una nueva empresa
-    public EmpresaCliente crearEmpresa(EmpresaCliente empresa) {
-        // Aquí en el futuro puedes poner validaciones (ej. comprobar si el dominio ya
-        // existe)
-        return repository.save(empresa);
+    // --- MÉTODOS PARA BUSCAR ---
+
+    public Optional<EmpresaCliente> buscarPorId(Long id) {
+        return repository.findById(id);
     }
 
+    // El método que pedía tu AuthController
     public Optional<EmpresaCliente> buscarPorDominio(String dominio) {
         return repository.findByDominioCorporativo(dominio);
     }
 
-    // Método para obtener todas las empresas
+    // --- MÉTODOS PARA LISTAR ---
+
+    public List<EmpresaCliente> obtenerTodas() {
+        return repository.findAll();
+    }
+
+    // El método que pedía tu EmpresaClienteController (hace lo mismo que el de
+    // arriba)
     public List<EmpresaCliente> listarEmpresas() {
         return repository.findAll();
     }
 
-    // Método para buscar por ID
-    public Optional<EmpresaCliente> buscarPorId(Long id) {
-        return repository.findById(id);
+    // --- MÉTODOS PARA GUARDAR ---
+
+    public EmpresaCliente guardar(EmpresaCliente empresa) {
+        return repository.save(empresa);
+    }
+
+    // El método que pedían ambos controladores (hace lo mismo que el de arriba)
+    public EmpresaCliente crearEmpresa(EmpresaCliente empresa) {
+        return repository.save(empresa);
     }
 }
