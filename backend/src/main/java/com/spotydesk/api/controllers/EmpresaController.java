@@ -2,6 +2,7 @@ package com.spotydesk.api.controllers;
 
 import com.spotydesk.api.models.EmpresaCliente;
 import com.spotydesk.api.services.EmpresaClienteService;
+import com.spotydesk.api.services.PlanoOficinaService; // <-- 1. Importamos el servicio del plano
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,14 +17,16 @@ public class EmpresaController {
     @Autowired
     private EmpresaClienteService empresaService;
 
-    // Método para obtener TODAS las empresas (Para el desplegable del
-    // registro)
+    @Autowired
+    private PlanoOficinaService planoOficinaService; // <-- 2. Inyectamos el servicio
+
+    // Método para obtener TODAS las empresas
     @GetMapping
     public List<EmpresaCliente> obtenerTodas() {
         return empresaService.obtenerTodas();
     }
 
-    // Cuando Angular pida /api/empresas/1, este método buscará la empresa 1
+    // Método para buscar una empresa concreta
     @GetMapping("/{id}")
     public EmpresaCliente obtenerEmpresaPorId(@PathVariable Long id) {
         Optional<EmpresaCliente> empresa = empresaService.buscarPorId(id);
@@ -35,8 +38,16 @@ public class EmpresaController {
         }
     }
 
+    // Método que registra la empresa y crea el plano
     @PostMapping
     public EmpresaCliente registrarEmpresa(@RequestBody EmpresaCliente empresa) {
-        return empresaService.guardar(empresa);
+        // A. Guardamos la empresa
+        EmpresaCliente empresaGuardada = empresaService.guardar(empresa);
+
+        // B. ¡MAGIA! Generamos el plano aleatorio para esta empresa
+        planoOficinaService.generarPlanoParaEmpresa(empresaGuardada);
+
+        // C. Devolvemos la empresa
+        return empresaGuardada;
     }
 }

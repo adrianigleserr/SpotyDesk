@@ -69,7 +69,31 @@
           class="flex items-center justify-between mb-8 border-b border-slate-100 pb-6 flex-wrap gap-4"
         >
           <h3 class="text-lg font-bold text-slate-800">Plano de Planta</h3>
-
+          @if (sugerenciaSalaIA) {
+            <div
+              class="mb-6 bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-4 animate-fade-in shadow-sm w-full"
+            >
+              <div
+                class="w-10 h-10 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+              </div>
+              <p class="text-amber-800 font-medium text-sm">{{ sugerenciaSalaIA }}</p>
+            </div>
+          }
           <div
             class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100 overflow-x-auto"
           >
@@ -95,20 +119,6 @@
         <div
           class="flex-1 bg-slate-50 p-6 rounded-2xl overflow-auto flex flex-col items-center justify-center border-2 border-dashed border-slate-200 min-h-[350px]"
         >
-          @if (datosSitios.length === 0) {
-            <div class="text-center animate-fade-in">
-              <p class="text-blue-600 font-bold mb-4 text-lg">
-                Esta oficina aún no tiene un plano configurado.
-              </p>
-              <button
-                (click)="generarPlanoPorDefecto()"
-                class="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:bg-blue-700 hover:scale-105 transition-all cursor-pointer"
-              >
-                Generar Plano Automático (Puestos y Salas)
-              </button>
-            </div>
-          }
-
           @if (datosSitios.length > 0) {
             <div
               class="grid gap-3 mx-auto w-full animate-fade-in"
@@ -147,15 +157,17 @@
                     </div>
 
                     <span
-                      class="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-2 py-1 rounded text-[10px] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20"
+                      class="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-2 py-1 rounded text-[10px] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50 shadow-lg"
                     >
                       {{
                         celda.mio
-                          ? 'Tu sitio (Click para cancelar)'
+                          ? 'Tu reserva (Click para cancelar)'
                           : celda.estado === 'ocupado'
-                            ? 'Ocupado por ' + celda.ocupante
+                            ? 'Lleno/Ocupado por ' + celda.ocupante
                             : celda.tipo === 'sala'
-                              ? 'Click para Reservar Sala'
+                              ? celda.ocupante
+                                ? 'Dentro: ' + celda.ocupante + ' (Click para unirte)'
+                                : 'Click para Reservar Sala'
                               : 'Click para Reservar Puesto'
                       }}
                     </span>

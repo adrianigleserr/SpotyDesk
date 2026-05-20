@@ -11,24 +11,21 @@ public class Sitio {
     private Long idSitio;
 
     @Column(nullable = false, length = 50)
-    private String numeroSitio; // Ej: "P1", "P2"
+    private String numeroSitio; // Ej: "P-01", "Sala Alfa"
 
     @Column(length = 50)
-    private String zona;
+    private String zona; // "Planta Principal", "Zona A"
 
-    // --- NUEVOS CAMPOS PARA LA MATRIZ ---
+    // --- CAMPOS PARA LA MATRIZ ---
+    @Column(name = "posicion_matriz", nullable = false)
+    private Integer posicionMatriz; // El número de celda (0 al 39 para una cuadrícula 8x5)
+
+    @Column(length = 20, nullable = false)
+    private String tipo; // "puesto", "sala", "pasillo"
+
     @Column(nullable = false)
-    private Integer capacidad; // 1 para puestos, 4-8 para salas, 0 para pasillos
-    @Column(name = "posicion_matriz")
-    private Integer posicionMatriz; // El número de celda en la cuadrícula (1 al 40)
-
-    @Column(length = 20)
-    private String tipo; // "puesto" (botón verde/gris) o "pasillo" (hueco en blanco)
-
-    // Nota: El 'estado' (libre/ocupado) no se guarda en el sitio,
-    // dependerá de si tiene una Reserva asociada para el día de hoy.
-
-    // ------------------------------------
+    private Integer capacidad; // 1 para puestos, 4 u 8 para salas, 0 para pasillos
+    // ----------------------------
 
     // Relación N:1 -> Muchos sitios pertenecen a una empresa
     @ManyToOne
@@ -38,6 +35,7 @@ public class Sitio {
     public Sitio() {
     }
 
+    // Getters y Setters...
     public Long getIdSitio() {
         return idSitio;
     }
@@ -78,19 +76,19 @@ public class Sitio {
         this.tipo = tipo;
     }
 
-    public EmpresaCliente getEmpresa() {
-        return empresa;
-    }
-
-    public void setEmpresa(EmpresaCliente empresa) {
-        this.empresa = empresa;
-    }
-
     public Integer getCapacidad() {
         return capacidad;
     }
 
     public void setCapacidad(Integer capacidad) {
         this.capacidad = capacidad;
+    }
+
+    public EmpresaCliente getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(EmpresaCliente empresa) {
+        this.empresa = empresa;
     }
 }

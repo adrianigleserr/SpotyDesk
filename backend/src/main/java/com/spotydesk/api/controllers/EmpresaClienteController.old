@@ -2,6 +2,7 @@ package com.spotydesk.api.controllers;
 
 import com.spotydesk.api.models.EmpresaCliente;
 import com.spotydesk.api.services.EmpresaClienteService;
+import com.spotydesk.api.services.PlanoOficinaService; // 1. IMPORTAMOS EL SERVICIO DEL PLANO
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,10 +10,14 @@ import java.util.List;
 
 @RestController // Indica que esta clase responderá peticiones web devolviendo datos (JSON)
 @RequestMapping("/api/empresas") // Todos los endpoints de este archivo empezarán por esta ruta
+@CrossOrigin(origins = "http://localhost:4200") // 2. AGREGAMOS CORS PARA QUE ANGULAR PUEDA LLAMAR A ESTE ENDPOINT
 public class EmpresaClienteController {
 
     @Autowired
     private EmpresaClienteService service;
+
+    @Autowired
+    private PlanoOficinaService planoOficinaService; // 3. INYECTAMOS EL NUEVO SERVICIO
 
     // Cuando hagamos un GET a http://localhost:8080/api/empresas
     @GetMapping
@@ -23,6 +28,13 @@ public class EmpresaClienteController {
     // Cuando hagamos un POST a http://localhost:8080/api/empresas enviando un JSON
     @PostMapping
     public EmpresaCliente registrarEmpresa(@RequestBody EmpresaCliente empresa) {
-        return service.crearEmpresa(empresa);
+        // A. Guardamos primero la empresa en la base de datos para obtener su ID autogenerado
+        EmpresaCliente empresaCreada = service.crearEmpresa(empresa);
+        
+        // B. Enviamos la empresa recién creada al servicio para que diseñe el plano aleatorio
+        planoOficinaService.generarPlanoParaEmpresa(empresaCreada);
+        
+        // C. Devolvemos el objeto que guardamos originalmente
+        return empresaCreada;
     }
 }
