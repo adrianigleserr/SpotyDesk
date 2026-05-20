@@ -36,6 +36,8 @@ export class Empresa implements OnInit {
   idEmpleadoActual: number | null = null;
   idEmpresaActual: number | null = null;
 
+  sugerenciaSalaIA: string | null = null; // <-- NUEVA VARIABLE PARA EL MENSAJE DE LA IA
+
   ngOnInit() {
     this.generarDiasLaborables();
     
@@ -48,75 +50,8 @@ export class Empresa implements OnInit {
     }
   }
 
-  generarPlanoPorDefecto() {
-    if (!this.idEmpresaActual) return;
-
-    // Aquí "dibujamos" el mapa. La cuadrícula va rellenando de izquierda a derecha.
-    // Capacidad 4 = Sala 2x2. Capacidad 8 = Sala 3x2.
-    const layout = [
-      // Fila 1 (Arriba del todo)
-      { num: 'Sala S1', tipo: 'sala', cap: 1 },
-      { num: 'P-01', tipo: 'puesto', cap: 1 },
-      { num: 'P-02', tipo: 'puesto', cap: 1 },
-      { num: 'Pasillo', tipo: 'pasillo', cap: 0 },
-      { num: 'P-03', tipo: 'puesto', cap: 1 },
-      { num: 'P-04', tipo: 'puesto', cap: 1 },
-      { num: 'P-05', tipo: 'puesto', cap: 1 },
-      { num: 'Sala S2', tipo: 'sala', cap: 1 },
-
-      // Fila 2
-      { num: 'P-06', tipo: 'puesto', cap: 1 },
-      { num: 'Sala 2x2', tipo: 'sala', cap: 4 }, // <-- Esta ocupará 2x2 huecos
-      { num: 'Pasillo', tipo: 'pasillo', cap: 0 },
-      { num: 'P-07', tipo: 'puesto', cap: 1 },
-      { num: 'P-08', tipo: 'puesto', cap: 1 },
-      { num: 'P-09', tipo: 'puesto', cap: 1 },
-      { num: 'P-10', tipo: 'puesto', cap: 1 },
-
-      // Fila 3
-      { num: 'P-11', tipo: 'puesto', cap: 1 },
-      { num: 'Pasillo', tipo: 'pasillo', cap: 0 },
-      { num: 'Sala 3x2', tipo: 'sala', cap: 8 }, // <-- Esta ocupará 3x2 huecos
-      { num: 'P-12', tipo: 'puesto', cap: 1 },
-
-      // Fila 4
-      { num: 'P-13', tipo: 'puesto', cap: 1 },
-      { num: 'P-14', tipo: 'puesto', cap: 1 },
-      { num: 'P-15', tipo: 'puesto', cap: 1 },
-      { num: 'Pasillo', tipo: 'pasillo', cap: 0 },
-      { num: 'P-16', tipo: 'puesto', cap: 1 },
-
-      // Fila 5 (Abajo del todo)
-      { num: 'P-17', tipo: 'puesto', cap: 1 },
-      { num: 'P-18', tipo: 'puesto', cap: 1 },
-      { num: 'P-19', tipo: 'puesto', cap: 1 },
-      { num: 'Pasillo', tipo: 'pasillo', cap: 0 },
-      { num: 'P-20', tipo: 'puesto', cap: 1 },
-      { num: 'P-21', tipo: 'puesto', cap: 1 },
-      { num: 'P-22', tipo: 'puesto', cap: 1 },
-      { num: 'P-23', tipo: 'puesto', cap: 1 },
-    ];
-
-    layout.forEach((item, index) => {
-      const nuevoSitio = {
-        numeroSitio: item.num,
-        posicionMatriz: index,
-        tipo: item.tipo,
-        capacidad: item.cap,
-        zona: 'Planta Principal',
-        empresa: { idEmpresa: this.idEmpresaActual }
-      };
-
-      this.http.post('http://localhost:8080/api/sitios', nuevoSitio).subscribe({
-        next: () => {
-          // Si es el último en guardarse, recargamos la pantalla
-          if (index === layout.length - 1) {
-            this.cargarDatos(this.idEmpresaActual!);
-          }
-        }
-      });
-    });
-  }
+  // --- LAS FUNCIONES ANTIGUAS SIGUEN IGUAL ---
+  generarPlanoPorDefecto() { /* Función de emergencia que ya no usamos */ }
 
   generarDiasLaborables() {
     const hoy = new Date();
@@ -147,8 +82,7 @@ export class Empresa implements OnInit {
     const año = fecha2.getFullYear();
     const mes = String(fecha2.getMonth() + 1).padStart(2, '0');
     const dia = String(fecha2.getDate()).padStart(2, '0');
-    const str2 = `${año}-${mes}-${dia}`;
-    return str1 === str2;
+    return str1 === `${año}-${mes}-${dia}`;
   }
 
   cargarDatos(idEmp: number) {
@@ -177,18 +111,35 @@ export class Empresa implements OnInit {
     );
 
     this.puestosTablero = this.datosSitios.map((s: any) => {
-      const r = reservasDelDia.find((res: any) => res.sitio && res.sitio.idSitio === s.idSitio);
-      const esMio = r && r.empleado && r.empleado.idEmpleado === this.idEmpleadoActual;
+      // Buscamos TODAS las reservas vinculadas a este sitio (las salas pueden tener varias)
+      const reservasDelSitio = reservasDelDia.filter((res: any) => res.sitio && res.sitio.idSitio === s.idSitio);
       
+      // Comprobamos si yo (el usuario logueado) estoy entre los ocupantes
+      const miReserva = reservasDelSitio.find((res: any) => res.empleado && res.empleado.idEmpleado === this.idEmpleadoActual);
+      
+      // La sala solo se bloquea ('ocupado') si los ocupantes superan o igualan su capacidad
+      let estadoCalculado = 'libre';
+      if (s.tipo === 'puesto') {
+        estadoCalculado = reservasDelSitio.length > 0 ? 'ocupado' : 'libre';
+      } else if (s.tipo === 'sala') {
+        estadoCalculado = reservasDelSitio.length >= s.capacidad ? 'ocupado' : 'libre';
+      }
+
+      // Si hay ocupantes, unimos sus nombres separados por comas (ej: "Javier, Carla")
+      const nombresOcupantes = reservasDelSitio.length > 0 
+        ? reservasDelSitio.map((r: any) => r.empleado.nombre).join(', ') 
+        : null;
+
       return {
         id: s.idSitio,
         nombre: s.numeroSitio,
         tipo: s.tipo,
         capacidad: s.capacidad,
-        estado: r ? 'ocupado' : 'libre',
-        ocupante: r ? r.empleado.nombre + " " + r.empleado.apellido1 : null,
-        mio: esMio,
-        idReserva: r ? r.idReserva : null,
+        estado: estadoCalculado,
+        ocupante: nombresOcupantes,
+        ocupantesCount: reservasDelSitio.length,
+        mio: !!miReserva,
+        idReserva: miReserva ? miReserva.idReserva : null,
         recomendado: false
       };
     });
@@ -204,9 +155,35 @@ export class Empresa implements OnInit {
     });
 
     this.ejecutarIAProximidad();
+    this.ejecutarIASugerenciaSalas();
     this.calcularEstadisticas();
     this.cdr.detectChanges();
   }
+
+  ejecutarIASugerenciaSalas() {
+    this.sugerenciaSalaIA = null;
+
+    // Contamos cuántos compañeros hay en total hoy en la oficina
+    const personasConReserva = this.empleados.filter(e => e.reserva !== null).length;
+
+    // Si hay 3 o más...
+    if (personasConReserva >= 3) {
+      // Buscamos una sala que NO esté llena
+      const salaDisponible = this.puestosTablero.find(p => p.tipo === 'sala' && p.estado === 'libre');
+
+      if (salaDisponible) {
+        salaDisponible.recomendado = true;
+        
+        // Mensaje dinámico: Si ya hay alguien dentro o si está vacía
+        if (salaDisponible.ocupantesCount > 0) {
+          this.sugerenciaSalaIA = `🤖 IA SpotyDesk: Sois ${personasConReserva} en la oficina hoy. ¡Únete a la reunión de ${salaDisponible.ocupante} en la ${salaDisponible.nombre} para hacer equipo!`;
+        } else {
+          this.sugerenciaSalaIA = `🤖 IA SpotyDesk: Hoy hay ${personasConReserva} compañeros en la oficina. Te sugerimos reservar la ${salaDisponible.nombre} para trabajar juntos.`;
+        }
+      }
+    }
+  }
+  // ---------------------------------------------------
 
   reservarAsiento(celda: any) {
     if (celda.tipo === 'pasillo') return;

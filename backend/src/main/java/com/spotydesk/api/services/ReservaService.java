@@ -1,7 +1,9 @@
 package com.spotydesk.api.services;
 
 import com.spotydesk.api.models.Reserva;
+import com.spotydesk.api.models.Sitio; // <-- 1. IMPORTAMOS EL MODELO SITIO
 import com.spotydesk.api.repositories.ReservaRepository;
+import com.spotydesk.api.repositories.SitioRepository; // <-- 2. IMPORTAMOS SU REPOSITORIO
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,9 @@ public class ReservaService {
 
     @Autowired
     private ReservaRepository repository;
+
+    @Autowired
+    private SitioRepository sitioRepository; // <-- 3. LO INYECTAMOS PARA PODER BUSCAR
 
     public List<Reserva> listarReservas() {
         return repository.findAll();
@@ -26,22 +31,32 @@ public class ReservaService {
                     reserva.getFechaInicio(),
                     reserva.getFechaFin());
             if (empleadoOcupado) {
-                throw new RuntimeException("ERROR_DOBLE_RESERVA"); // Lanzamos un error muy claro
+                throw new RuntimeException("ERROR_DOBLE_RESERVA");
             }
         }
 
         // 2. VALIDAR: ¿El sitio ya está ocupado por otra persona en ese horario?
         if (reserva.getSitio() != null) {
-            boolean sitioOcupado = repository.isSitioOcupado(
-                    reserva.getSitio().getIdSitio(),
-                    reserva.getFechaInicio(),
-                    reserva.getFechaFin());
-            if (sitioOcupado) {
-                throw new RuntimeException("El sitio ya está reservado en ese horario.");
+            // Buscamos en la BBDD el sitio que están intentando reservar
+            Sitio sitio = sitioRepository.findById(reserva.getSitio().getIdSitio()).orElse(null);
+
+            // Si es un "puesto" individual, aplicamos el candado estricto de siempre
+            if (sitio != null && "puesto".equals(sitio.getTipo())) {
+                boolean sitioOcupado = repository.isSitioOcupado(
+                        reserva.getSitio().getIdSitio(),
+                        reserva.getFechaInicio(),
+                        reserva.getFechaFin());
+                if (sitioOcupado) {
+                    throw new RuntimeException("El puesto individual ya está reservado en ese horario.");
+                }
             }
+            // Si es una "sala", NO hacemos esta comprobación estricta y dejamos que se
+            // guarde la reserva.
+            // (El bloqueo real de aforo ya lo controla Angular en el Frontend).
         }
 
-        // 3. VALIDAR: ¿La sala ya está ocupada?
+        // 3. VALIDAR: ¿La sala antigua ya está ocupada? (Mantenemos este código por si
+        // tienes tablas legacy)
         if (reserva.getSala() != null) {
             boolean salaOcupada = repository.isSalaOcupada(
                     reserva.getSala().getIdSala(),
