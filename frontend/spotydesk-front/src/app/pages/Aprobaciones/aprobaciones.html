@@ -1,0 +1,130 @@
+<div class="max-w-[1000px] mx-auto p-6 space-y-8 animate-fade-in">
+  <div>
+    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Buzón de Aprobaciones</h2>
+    <p class="text-slate-500 mt-1 text-lg">
+      Gestiona las solicitudes de acceso de los nuevos empleados a tu empresa.
+    </p>
+  </div>
+
+  @if (cargando) {
+    <div class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <span class="ml-3 text-slate-500 font-bold">Cargando buzón...</span>
+    </div>
+  }
+
+  @if (!cargando) {
+    @if (!esAdmin) {
+      <div
+        class="bg-red-50 border border-red-200 text-red-600 p-6 rounded-2xl text-center shadow-sm"
+      >
+        <h3 class="font-bold text-lg">Acceso Denegado</h3>
+        <p>Solo los administradores de la empresa pueden ver el buzón de entrada.</p>
+      </div>
+    }
+
+    @if (esAdmin) {
+      <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+        @if (pendientes.length === 0) {
+          <div class="text-center py-12">
+            <div
+              class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                />
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold text-slate-700">Tu buzón está vacío</h3>
+            <p class="text-slate-500">No hay nuevas solicitudes de acceso pendientes.</p>
+          </div>
+        }
+
+        @if (pendientes.length > 0) {
+          <div class="space-y-4">
+            @for (emp of pendientes; track emp.idEmpleado) {
+              <div
+                class="flex items-center justify-between p-5 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-colors border border-slate-200"
+              >
+                <div class="flex items-center gap-4">
+                  <img
+                    [src]="
+                      'https://ui-avatars.com/api/?name=' +
+                      emp.nombre +
+                      '+' +
+                      (emp.apellido1 || '') +
+                      '&background=0D8ABC&color=fff'
+                    "
+                    class="w-12 h-12 rounded-full shadow-sm"
+                    alt="Avatar"
+                  />
+                  <div>
+                    <h4 class="text-base font-bold text-slate-800">
+                      {{ emp.nombre }} {{ emp.apellido1 }}
+                    </h4>
+                    <p class="text-sm font-medium text-slate-500 flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                        />
+                      </svg>
+                      {{ emp.correo }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <button
+                    (click)="cambiarEstado(emp, 'RECHAZADO')"
+                    class="px-4 py-2 bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 font-bold rounded-xl transition-all shadow-sm cursor-pointer"
+                  >
+                    Rechazar
+                  </button>
+                  <button
+                    (click)="cambiarEstado(emp, 'ACTIVO')"
+                    class="px-4 py-2 bg-emerald-500 text-white hover:bg-emerald-600 font-bold rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Aceptar
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

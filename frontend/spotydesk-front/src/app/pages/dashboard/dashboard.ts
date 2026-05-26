@@ -19,6 +19,7 @@ export class Dashboard implements OnInit {
   diaSeleccionado: number = this.diaHoy;
 
   mostrarModalNota = false;
+  esAdmin: boolean = false; // 🔥 NUEVO: Variable para controlar el acceso
 
   // Objeto corregido para los inputs
   nuevaNota = {
@@ -36,6 +37,13 @@ export class Dashboard implements OnInit {
 
   ngOnInit() {
     this.actualizarCalendario();
+
+    // 🔥 Leer quién está conectado y chivarnos en la consola
+    const usuarioJSON = localStorage.getItem('usuarioSpotyDesk');
+    if (usuarioJSON) {
+      const usuario = JSON.parse(usuarioJSON);
+      this.esAdmin = usuario.rol === 'ADMIN' || usuario.rol === 'Administrador';
+    }
   }
 
   get notasDelDia() {

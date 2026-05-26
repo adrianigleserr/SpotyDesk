@@ -29,4 +29,17 @@ public class EmpleadoController {
     public List<Empleado> obtenerPorEmpresa(@PathVariable Long idEmpresa) {
         return service.obtenerEmpleadosPorEmpresa(idEmpresa);
     }
+    // --- NUEVOS ENDPOINTS PARA EL BUZÓN ---
+
+    // El frontend llamará a esto para ver si hay notificaciones
+    @GetMapping("/empresa/{idEmpresa}/pendientes")
+    public List<Empleado> obtenerPendientes(@PathVariable Long idEmpresa) {
+        return service.obtenerPendientesPorEmpresa(idEmpresa);
+    }
+
+    // El frontend llamará a esto cuando el jefe le dé a "Aceptar" o "Rechazar"
+    @PutMapping("/{idEmpleado}/estado/{nuevoEstado}")
+    public Empleado cambiarEstado(@PathVariable Long idEmpleado, @PathVariable String nuevoEstado) {
+        return service.actualizarEstado(idEmpleado, nuevoEstado);
+    }
 }

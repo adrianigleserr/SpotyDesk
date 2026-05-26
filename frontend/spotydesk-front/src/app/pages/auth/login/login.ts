@@ -50,14 +50,21 @@ export class Login {
       },
       
       // 🔴 Si el backend dice "Error" (Código 400 - Tu ManejadorDeErrores)
-      error: (errorRespuesta) => {
-        console.error('Error en el login', errorRespuesta);
+      error: (err) => {
+        console.error('Error completo en el login:', err);
         
-        // Extraemos el mensaje de tu backend ("Contraseña incorrecta" o "Correo no registrado")
-        if (errorRespuesta.error && errorRespuesta.error.error) {
-          this.mensajeError = errorRespuesta.error.error;
+        // Buscamos el mensaje en las posibles estructuras de error de Spring Boot
+        if (typeof err.error === 'string') {
+          // A veces Spring Boot devuelve el texto pelado
+          this.mensajeError = err.error;
+        } else if (err.error?.message) {
+          // Esta es la estructura más común
+          this.mensajeError = err.error.message;
+        } else if (err.error?.error) {
+          this.mensajeError = err.error.error;
         } else {
-          this.mensajeError = 'No se pudo conectar con el servidor. ¿Está encendido el backend?';
+          // Fallback por si acaso
+          this.mensajeError = err.message || 'Error desconocido al iniciar sesión.';
         }
       }
     });

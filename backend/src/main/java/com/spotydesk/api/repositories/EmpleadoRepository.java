@@ -1,6 +1,8 @@
 package com.spotydesk.api.repositories;
 
 import com.spotydesk.api.models.Empleado;
+import com.spotydesk.api.models.EmpresaCliente;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,6 +13,8 @@ import java.util.Optional;
 public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
 
     Optional<Empleado> findByCorreo(String correo);
+
+    long countByEmpresa(EmpresaCliente empresa);
 
     boolean existsByCorreo(String correo);
 
