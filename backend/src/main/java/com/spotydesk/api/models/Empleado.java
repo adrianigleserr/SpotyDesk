@@ -34,20 +34,35 @@ public class Empleado {
     @Column(nullable = false)
     private String password;
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     private Integer anioIncorporacion;
+
+    // --- NUEVOS CAMPOS PARA EL FLUJO DE APROBACIÓN ---
+    @Column(length = 20)
+    private String rol = "EMPLEADO"; // Puede ser "ADMIN" o "EMPLEADO"
+
+    @Column(length = 20)
+    private String estado = "PENDIENTE"; // Puede ser "PENDIENTE", "ACTIVO" o "RECHAZADO"
+    // -------------------------------------------------
 
     // Relación N:1 -> Muchos empleados pertenecen a una empresa
     @ManyToOne
     @JoinColumn(name = "id_empresa", nullable = false)
     private EmpresaCliente empresa;
+
+    // Relación N:1 (Recursiva) -> Muchos empleados pueden tener el mismo jefe
+    @ManyToOne
+    @JoinColumn(name = "id_empleado_jefe")
+    private Empleado jefe;
+
+    // Relación N:1 -> Varios empleados podrían tener el mismo sitio como favorito
+    @ManyToOne
+    @JoinColumn(name = "id_sitio_favorito")
+    private Sitio sitioFavorito;
+
+    public Empleado() {
+    }
+
+    // --- GETTERS Y SETTERS ---
 
     public Long getIdEmpleado() {
         return idEmpleado;
@@ -113,12 +128,36 @@ public class Empleado {
         this.puestoTrabajo = puestoTrabajo;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public Integer getAnioIncorporacion() {
         return anioIncorporacion;
     }
 
     public void setAnioIncorporacion(Integer anioIncorporacion) {
         this.anioIncorporacion = anioIncorporacion;
+    }
+
+    public String getRol() {
+        return rol;
+    }
+
+    public void setRol(String rol) {
+        this.rol = rol;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 
     public EmpresaCliente getEmpresa() {
@@ -144,18 +183,4 @@ public class Empleado {
     public void setSitioFavorito(Sitio sitioFavorito) {
         this.sitioFavorito = sitioFavorito;
     }
-
-    // Relación N:1 (Recursiva) -> Muchos empleados pueden tener el mismo jefe
-    @ManyToOne
-    @JoinColumn(name = "id_empleado_jefe")
-    private Empleado jefe;
-
-    // Relación N:1 -> Varios empleados podrían tener el mismo sitio como favorito
-    @ManyToOne
-    @JoinColumn(name = "id_sitio_favorito")
-    private Sitio sitioFavorito;
-
-    public Empleado() {
-    }
-
 }

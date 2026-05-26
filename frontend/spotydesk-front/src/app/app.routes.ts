@@ -6,9 +6,11 @@ import { RecuperarClave } from './pages/auth/recuperar-clave/recuperar-clave';
 import { Empresa } from './pages/empresa/empresa';
 import { Usuario } from './pages/usuario/usuario';
 import { Reservas } from './pages/reservas/reservas';
-
-// NUEVO IMPORT: Añadimos la ruta hacia tu nuevo componente
 import { RegistroEmpresa } from './pages/auth/registro-empresa/registro-empresa';
+import { Aprobaciones } from './pages/Aprobaciones/aprobaciones';
+
+// NUEVO IMPORT: Añadimos la ruta hacia tu nuevo componente de aprobaciones
+// Asumiendo que has creado la carpeta dentro de 'pages'
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -17,13 +19,18 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'registro', component: Registro },
   { path: 'recuperar-clave', component: RecuperarClave },
-  { path: 'registro-empresa', component: RegistroEmpresa }, // Ya funciona gracias al import
+  { path: 'registro-empresa', component: RegistroEmpresa },
   
   // Rutas de Paneles
   { path: 'dashboard', component: Dashboard },
   { path: 'reservas', component: Reservas },
   { path: 'empresa', component: Empresa },
   { path: 'usuario', component: Usuario },
+  
+  // Ruta del Buzón de Notificaciones
+  { path: 'aprobaciones', component: Aprobaciones },
 
+  // Ruta comodín (si el usuario escribe una URL que no existe, lo mandamos al login)
+  // ¡Importante que esta siempre sea la última!
   { path: '**', redirectTo: 'login' }
 ];
