@@ -20,7 +20,6 @@
             <div
               class="w-full h-full bg-slate-100 rounded-full flex items-center justify-center overflow-hidden"
             >
-              <!-- AQUÍ ESTÁ EL CAMBIO PARA MOSTRAR EL AVATAR -->
               @if (avatarUrl) {
                 <img [src]="avatarUrl" alt="Avatar" class="w-full h-full object-cover" />
               } @else {
@@ -226,6 +225,64 @@
             <p class="text-[11px] text-slate-400 mt-2 font-medium">
               El correo está vinculado a tu cuenta corporativa y no se puede modificar.
             </p>
+          </div>
+
+          <div class="mt-4 sm:col-span-2 border-t border-slate-100 pt-6">
+            <h4 class="text-sm font-bold text-slate-800 mb-4 uppercase tracking-wider text-left">
+              Ajustes de Oficina
+            </h4>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2"
+              >Departamento</label
+            >
+            <input
+              [(ngModel)]="usuario.departamento"
+              type="text"
+              class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-700 font-medium"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Modalidad</label>
+            <input
+              [(ngModel)]="usuario.modalidad"
+              type="text"
+              placeholder="Ej: Remoto, Híbrido..."
+              class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-700 font-medium"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2"
+              >Edificio Principal</label
+            >
+            <input
+              [(ngModel)]="usuario.edificio"
+              type="text"
+              class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-700 font-medium"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2"
+              >Asiento Favorito</label
+            >
+            <input
+              [(ngModel)]="usuario.asientoFavorito"
+              type="text"
+              placeholder="Ej: Planta 2, Mesa 4..."
+              class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-700 font-medium"
+            />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2"
+              >Fecha de Ingreso</label
+            >
+            <input
+              [(ngModel)]="usuario.fechaIngreso"
+              type="text"
+              placeholder="Ej: 2024"
+              class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-700 font-medium"
+            />
           </div>
         </div>
 
